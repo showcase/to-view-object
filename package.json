@@ -2,6 +2,7 @@
   "name":        "to-view-object",
   "version":     "0.0.1",
   "description": "Extend/base a class on this to enable template-able `toViewObject` method",
+  "private": true,
 
   "repository" : {
     "type": "git",
