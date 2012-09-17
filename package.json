@@ -1,0 +1,29 @@
+{
+  "name":        "to-view-object",
+  "version":     "0.0.1",
+  "description": "Extend/base a class on this to enable template-able `toViewObject` method",
+
+  "repository" : {
+    "type": "git",
+    "url":  "https://github.com/showcase/to-view-object.git"
+  },
+  
+	"main": "./lib/wrapper.js",  
+
+  "dependencies": {
+    "async": "0.1.22",
+    "underscore": "1.3.3"
+  },
+  
+  "devDependencies": {
+    "forever": "0.10.0",
+    "optimist": "0.3.1",  
+    "sinon": "1.3.4",
+    "nodeunit": "0.7.4"
+  },
+  
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.1.x"
+  }
+}

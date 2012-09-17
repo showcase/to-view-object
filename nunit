@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+
+process.env.NODE_ENV = 'testing';
+
+/**
+ * Runner
+ */
+
+var async = require('async'),
+    argv = require('optimist').argv,
+    reporter = require('nodeunit').reporters[argv.reporter || 'skip_passed'],
+    fs = require('fs');
+  
+var mocker = require('./test/utils/mocker');
+
+var options = { error_prefix: '\u001b[31m',
+  error_suffix: '\u001b[39m',
+  ok_prefix: '\u001b[32m',
+  ok_suffix: '\u001b[39m',
+  bold_prefix: '\u001b[1m',
+  bold_suffix: '\u001b[22m',
+  comments_prefix: '\u001b[37m',
+  comments_suffix: '\u001b[39m',
+  assertion_prefix: '\u001b[35m',
+  assertion_suffix: '\u001b[39m',
+  output: argv.output };
+
+var exit = !argv.wait;
+
+var allTestsDescription = ' ';
+
+function run() {
+  var errors = {};
+
+  var start = new Date();
+
+  var testsToRun = argv._ || ['test'];
+
+  var testNum = 0, totalTests = testsToRun.length;
+
+  async.forEachSeries(testsToRun, function(fileName, done) {      
+    mocker.restore();
+
+    reporter.run([fileName], options, function(err) {
+      if (err) errors[fileName] = err;
+
+      testNum += 1;
+      console.log('\nCompleted ' + testNum + ' of ' + totalTests);
+
+      done();
+    });
+  }, function () {
+    var failedTests = Object.keys(errors);
+
+    var duration = new Date() - start;
+
+    if (0 < failedTests.length) {
+      if (1 < testsToRun.length) {
+        console.error("\n" + options.bold_prefix + options.error_prefix + "FAILURES: " + options.error_suffix + options.bold_suffix + failedTests.length + "/" + testsToRun.length + " tests failed (" + duration + "ms)");
+        // console.error(failedTests);
+        console.error(options.comments_prefix + failedTests.join(' ') + options.comments_suffix);
+        process.stdout.write('\n');
+      }
+      
+      if (exit) { process.exit(-1); } else { process.stdin.resume(); }
+    } else {
+      console.info("\n" + options.bold_prefix + options.ok_prefix + "SUCCESS: " + options.ok_suffix + options.bold_suffix + "all tests passed (" + duration + "ms)");
+      process.stdout.write('\n');
+      
+      if (exit) { process.exit(0); } else { process.stdin.resume(); }
+    }
+  });
+
+  if (!exit) {
+    process.on('uncaughtException', function(err) {
+      console.error(err.stack);
+    });    
+  }
+}
+
+run();

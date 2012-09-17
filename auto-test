@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+var argv = require('optimist').argv;
+
+var forever = require('forever');
+
+var test = new (forever.Monitor)(['./nunit'].concat(argv._).concat(['--reporter=default', '--wait']), {
+  silent: false,
+  options: [],
+  
+  'minUptime': 1000,
+  'spinSleepTime': 5000,  
+  
+  'watch': true,
+  'watchIgnoreDotFiles': true,
+  'watchDirectory': __dirname
+});
+
+test.times = 2;
+ 
+test.on('exit', function() {
+  console.log('App quit' + test.times);
+});
+
+test.start();
